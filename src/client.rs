@@ -15,6 +15,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut username = String::new();
     stdin.lock().read_line(&mut username)?;
+    username = username.trim().to_string();
 
     let join_request = JoinRequest { username: username.clone() };
 
@@ -32,6 +33,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     loop {
         let mut buffer = String::new();
         stdin.lock().read_line(&mut buffer)?;
+        buffer = buffer.trim().to_string();
 
         let msg = Message { sender: username.clone(), body: buffer };
         client.send_message(msg).await?;
