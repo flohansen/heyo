@@ -1,4 +1,5 @@
 # Heyo!
+![License](https://img.shields.io/badge/License-GPLv3-blue.svg)
 
 ## What is Heyo!?
 Heyo! is a collaboration platform helping teams to work efficiently.
