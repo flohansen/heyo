@@ -1,0 +1,23 @@
+syntax = "proto3";
+package heyo_chat;
+
+service ChatService {
+    rpc Join(JoinRequest) returns (stream Message);
+    rpc SendMessage(Message) returns (Empty);
+}
+
+message JoinRequest {
+    string username = 1;
+}
+
+message JoinResponse {
+    int32 code = 1;
+    string msg = 2;
+}
+
+message Message {
+    string sender = 2;
+    string body = 3;
+}
+
+message Empty {}

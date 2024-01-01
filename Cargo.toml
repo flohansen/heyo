@@ -1,0 +1,23 @@
+[package]
+name = "server"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[[bin]]
+name = "heyo-server"
+path = "src/server.rs"
+
+[[bin]]
+name = "heyo-client"
+path = "src/client.rs"
+
+[dependencies]
+tonic = "0.10"
+prost = "0.12"
+tokio = { version = "1.0", features = ["full"] }
+tokio-stream = "0.1"
+
+[build-dependencies]
+tonic-build = "0.10"
