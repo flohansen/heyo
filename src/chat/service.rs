@@ -2,13 +2,16 @@ pub mod heyo_chat {
     tonic::include_proto!("heyo_chat");
 }
 
+use jsonwebtoken::Algorithm;
+use jsonwebtoken::Validation;
+use jsonwebtoken::DecodingKey;
 use std::{collections::HashMap, sync::Arc};
-
 use tokio::sync::{mpsc, RwLock};
 use tokio_stream::wrappers::ReceiverStream;
 use tonic::{Status, Request, Response, Code};
-
 use heyo_chat::{Message, JoinRequest, Empty, chat_server::Chat};
+
+use super::jwt::Claims;
 
 struct Connections {
     users: HashMap<String, mpsc::Sender<Message>>,
@@ -25,14 +28,15 @@ impl Connections {
 }
 
 pub struct HeyoChat {
+    jwt_secret: String,
     connections: Arc<RwLock<Connections>>,
 }
 
 impl HeyoChat {
-    pub fn new() -> HeyoChat {
+    pub fn new(jwt_secret: String) -> HeyoChat {
         let users = HashMap::new();
         let connections = Arc::new(RwLock::new(Connections { users }));
-        HeyoChat { connections }
+        HeyoChat { jwt_secret, connections }
     }
 }
 
@@ -44,10 +48,15 @@ impl Chat for HeyoChat {
         &self,
         request: Request<JoinRequest>,
     ) -> Result<Response<Self::JoinStream>, Status> {
-        let username = request.into_inner().username;
+        let token_str = request.into_inner().token;
+
+        let key = DecodingKey::from_secret(self.jwt_secret.as_bytes());
+        let validation = Validation::new(Algorithm::HS256);
+        let token = jsonwebtoken::decode::<Claims>(&token_str, &key, &validation).unwrap();
+
         let (stream_tx, stream_rx) = mpsc::channel(1);
 
-        if let Some(_) = self.connections.read().await.users.get(&username) {
+        if let Some(_) = self.connections.read().await.users.get(&token.claims.username) {
             return Err(Status::new(Code::AlreadyExists, "already connected"));
         }
 
@@ -57,7 +66,7 @@ impl Chat for HeyoChat {
             .write()
             .await
             .users
-            .insert(username, tx);
+            .insert(token.claims.username, tx);
 
         tokio::spawn(async move {
             while let Some(msg) = rx.recv().await {

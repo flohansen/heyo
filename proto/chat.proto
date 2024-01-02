@@ -7,7 +7,7 @@ service Chat {
 }
 
 message JoinRequest {
-    string username = 1;
+    string token = 1;
 }
 
 message JoinResponse {
