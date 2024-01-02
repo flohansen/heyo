@@ -1,7 +1,7 @@
 syntax = "proto3";
 package heyo_chat;
 
-service ChatService {
+service Chat {
     rpc Join(JoinRequest) returns (stream Message);
     rpc SendMessage(Message) returns (Empty);
 }

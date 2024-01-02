@@ -4,12 +4,12 @@ pub mod heyo_chat {
 
 use std::io::BufRead;
 
-use heyo_chat::{chat_service_client::ChatServiceClient, JoinRequest, Message};
+use heyo_chat::{chat_client::ChatClient, JoinRequest, Message};
 use tonic::Request;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let mut client = ChatServiceClient::connect("http://[::1]:50051").await?;
+    let mut client = ChatClient::connect("http://[::1]:50051").await?;
 
     let stdin = std::io::stdin();
 
